@@ -109,7 +109,7 @@ if st.session_state['df_current'] is not None:
             thirdselect = st.selectbox('기준을 고르세요.',['선택하세요']+list(df.columns))
             if thirdselect != '선택하세요':
                 fourtyselect = st.checkbox('정렬 순서를 선택하세요. (기본값: 오름차순)')
-                if fourtyselect == '오름차순':
+                if fourtyselect:
                     st.text(thirdselect + '기준으로 내림차순 정렬한 결과')
                     dfrs = df.sort_values(thirdselect , ascending=False)
                     resultset()
