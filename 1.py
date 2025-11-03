@@ -45,7 +45,11 @@ if 'df_current' not in st.session_state:
 st.header('정보 분석 사이트')
 csvfile = st.file_uploader('파일을 업로드하세요.', type='csv',key=f"file_uploader_{st.session_state.reset_trigger}")
 if csvfile is not None and st.session_state['df_original'] is None:
-    st.session_state['df_original'] = pd.read_csv(csvfile)
+    try:
+        st.session_state['df_original'] = pd.read_csv(csvfile)
+    except UnicodeDecodeError:
+        csvfile.seek(0)
+        st.session_state['df_original'] = pd.read_csv(csvfile, encoding='cp949')
     # 초기 분석 대상은 원본 데이터로 설정
     st.session_state['df_current'] = st.session_state['df_original'].copy() 
     st.rerun() # 데이터 로드 후 새로고침하여 상태 반영
