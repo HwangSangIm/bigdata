@@ -64,7 +64,6 @@ if st.session_state['df_current'] is not None:
     first_options = ['선택하세요','데이터 추출하기','결측치 제거하기','변수 추가하기','그래프로 출력하기']
     firstselect = st.selectbox('어떠한 분석을 하시겠습니까?',first_options,index=0,key=f'first_select_{st.session_state.analysis_step_key}')
     if firstselect == '데이터 추출하기':
-        st.text('데이터 추출하기')
         second_option = ['선택하세요','조건에 맞는 데이터만 추출하기','필요한 변수만 추출하기','순서대로 정렬하기','집단별로 요약하기']
         secondselect = st.selectbox('어떠한 방법으로 전처리 하시겠습니까?',second_option,key=f'second_select_{st.session_state.analysis_step_key}')
         selected_index = second_option.index(secondselect)
@@ -138,6 +137,11 @@ if st.session_state['df_current'] is not None:
                                 resultset()
     if firstselect == '결측치 제거하기':
         st.text('결측치 제거하기')
+        second_option = ['선택하세요','결측치 확인','결측치 제거','결측치 변경','이상치 확인']
+        secondselect = st.selectbox('어떠한 방법을 사용하시겠습니까?',second_option)
+        selected_index = second_option.index(secondselect)
+        if selected_index == 1:
+            thirdselect = st.multiselect('어떤 데이터의 결측치를 확인하시겠습니까?',df.columns)
     if firstselect == '변수 추가하기':
         st.text('변수 추가하기')
     if firstselect == '그래프로 출력하기':
