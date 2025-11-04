@@ -5,6 +5,16 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import time
 
+def clear_all_state():
+    file_uploader_key = f"file_uploader_{st.session_state.reset_trigger}"
+    if st.session_state[file_uploader_key] is None:
+        st.session_state['df_original'] = None
+        st.session_state['df_current'] = None
+        if 'reset_trigger' in st.session_state:
+            st.session_state.reset_trigger += 1
+        else:
+            st.session_state.reset_trigger = 0
+
 def resultset ():
     st.dataframe(dfrs)
     st.subheader('다음 행동 선택')
@@ -43,7 +53,7 @@ if 'df_current' not in st.session_state:
     st.session_state['df_current'] = None
 
 st.header('정보 분석 사이트')
-csvfile = st.file_uploader('파일을 업로드하세요.', type='csv',key=f"file_uploader_{st.session_state.reset_trigger}")
+csvfile = st.file_uploader('파일을 업로드하세요.', type='csv',key=f"file_uploader_{st.session_state.reset_trigger}",on_change=clear_all_state)
 if csvfile is not None and st.session_state['df_original'] is None:
     try:
         st.session_state['df_original'] = pd.read_csv(csvfile)
@@ -60,6 +70,7 @@ if st.session_state['df_current'] is not None:
     else:
         st.text('수정된 파일 내용')
     df = st.session_state['df_current']
+    dfrs = df
     st.dataframe(df)
     first_options = ['선택하세요','데이터 추출하기','결측치 제어하기','변수 추가하기','그래프로 출력하기']
     firstselect = st.selectbox('어떠한 분석을 하시겠습니까?',first_options,index=0,key=f'first_select_{st.session_state.analysis_step_key}')
@@ -137,7 +148,7 @@ if st.session_state['df_current'] is not None:
                                 resultset()
     if firstselect == '결측치 제어하기':
         st.text('결측치 제어하기')
-        second_option = ['선택하세요','결측치 확인','결측치 제거','결측치 변경','이상치 확인']
+        second_option = ['선택하세요','결측치 확인','결측치 제거','결측치 변경']
         secondselect = st.selectbox('어떠한 방법을 사용하시겠습니까?',second_option)
         selected_index = second_option.index(secondselect)
         if selected_index == 1:
@@ -146,15 +157,16 @@ if st.session_state['df_current'] is not None:
                 dfrs = df[thirdselect].isna().sum()
                 st.dataframe(dfrs)
         if selected_index == 2:
-            thirdselect = st.multiselect('어떤 데이터 결측치를 제거하시겠습니까?',df.columns)
+            thirdselect = st.multiselect('어떤 데이터 결측치를 제거하시겠습니까?(빈칸 포함)',df.columns)
             if len(thirdselect) > 0:
+                dfrs[thirdselect] = dfrs[thirdselect].replace(r'^\s*$',np.nan,regex=True)
                 dfrs = df.dropna(subset=thirdselect)
                 st.text('제거할 데이터')
                 st.dataframe(df[thirdselect])
                 st.text('결측치를 제거한 결과')
                 resultset()
         if selected_index == 3:
-            thirdselect = st.multiselect('어떤 데이터의 결측치 값을 바꾸겠습니까?',df.columns)
+            thirdselect = st.multiselect('어떤 데이터의 결측치 값을 바꾸겠습니까?(빈칸 포함)',df.columns)
             if len(thirdselect) > 0:
                 count = 0
                 for checktype in thirdselect:
@@ -164,15 +176,17 @@ if st.session_state['df_current'] is not None:
                     if thirdtype.kind in ('i','f'):
                         NaNChange = st.text_input('변경할 숫자를 입력하세요.', key=f'input_int_{checktype}')
                         if NaNChange:
+                            dfrs[checktype] = dfrs[checktype].replace(r'^\s*$',np.nan,regex=True)
                             changeVal = float(NaNChange)
                             if thirdtype.kind == 'i':
-                                changeVal = int(changeVal) 
-                            df[checktype] = df[checktype].fillna(changeVal)
+                                changeVal = int(changeVal)
+                            dfrs[checktype] = dfrs[checktype].fillna(changeVal)
                             count = count + 1
                     elif thirdtype == 'object':
                         NaNChange = st.text_input('변경할 이름을 입력하세요.', key=f'input_object_{checktype}')
                         if NaNChange:
-                            df[checktype] = df[checktype].fillna(NaNChange)
+                            dfrs[checktype] = dfrs[checktype].replace(r'^\s*$',np.nan,regex=True)
+                            dfrs[checktype] = dfrs[checktype].fillna(NaNChange)
                             count = count + 1
                 if count == len(thirdselect):
                     st.text('변경할 데이터')
@@ -182,5 +196,15 @@ if st.session_state['df_current'] is not None:
                     resultset()
     if firstselect == '변수 추가하기':
         st.text('변수 추가하기')
+        secondselect = st.selectbox('어떠한 변수를 추가하실건가요?',['선택하세요','상수 추가','기존 열을 이용한 계산','assign() 함수 이용','사용자 입력'])
+        if secondselect != '선택하세요':
+            if secondselect == '상수 추가':
+                byunsuName = st.text_input('변수 이름을 입력하세요')
+                if byunsuName:
+                    gap = st.text_input('값을 입력하세요')
+                    if gap:
+                        dfrs[byunsuName] = gap
+                        st.text('상수를 추가한 결과')
+                        resultset()
     if firstselect == '그래프로 출력하기':
         st.text('그래프로 출력하기')
