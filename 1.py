@@ -70,7 +70,7 @@ if st.session_state['df_current'] is not None:
     else:
         st.text('수정된 파일 내용')
     df = st.session_state['df_current']
-    dfrs = df
+    dfrs = df.copy()
     st.dataframe(df)
     first_options = ['선택하세요','데이터 추출하기','결측치 제어하기','변수 추가하기','그래프로 출력하기']
     firstselect = st.selectbox('어떠한 분석을 하시겠습니까?',first_options,index=0,key=f'first_select_{st.session_state.analysis_step_key}')
@@ -196,15 +196,95 @@ if st.session_state['df_current'] is not None:
                     resultset()
     if firstselect == '변수 추가하기':
         st.text('변수 추가하기')
-        secondselect = st.selectbox('어떠한 변수를 추가하실건가요?',['선택하세요','상수 추가','기존 열을 이용한 계산','assign() 함수 이용','사용자 입력'])
-        if secondselect != '선택하세요':
-            if secondselect == '상수 추가':
-                byunsuName = st.text_input('변수 이름을 입력하세요')
-                if byunsuName:
-                    gap = st.text_input('값을 입력하세요')
-                    if gap:
-                        dfrs[byunsuName] = gap
-                        st.text('상수를 추가한 결과')
+        secondselect = st.selectbox('어떠한 변수를 추가하실건가요?',['선택하세요','상수 추가','기존 열을 이용한 계산','사용자 입력'])
+        if secondselect == '상수 추가':
+            byunsuName = st.text_input('변수 이름을 입력하세요')
+            if byunsuName:
+                gap = st.text_input('값을 입력하세요')
+                if gap:
+                    dfrs[byunsuName] = gap
+                    st.text('상수를 추가한 결과')
+                    resultset()
+        if secondselect == '기존 열을 이용한 계산':
+            byunsuName = st.text_input('변수 이름을 입력하세요.')
+            if byunsuName:
+                thirdselect = st.selectbox('어떠한 계산을 하시겠습니까?',['선택하세요','기본 연산자 사용','스칼라(단일 값) 연산','단일 조건문'])
+                if thirdselect == '기본 연산자 사용':
+                    fourtyselect = st.multiselect('데이터를 선택헤주세요.(순서 상관 있습니다.)',df.select_dtypes(include=['number']).columns)
+                    if fourtyselect:
+                        fiftyselect = st.selectbox('기호를 선택하세요.',['선택하세요','+','-','*','/','%'])
+                        if fiftyselect == '+':
+                            dfrs[byunsuName] = dfrs[fourtyselect].sum(axis=1)
+                            st.text('기존 열을 이용해 추가한 결과')
+                            resultset()
+                        if fiftyselect == '-':
+                            if len(fourtyselect) == 2:
+                                dfrs[byunsuName] = dfrs[fourtyselect[0]] - dfrs[fourtyselect[1]]
+                                st.text('기존 열을 이용해 추가한 결과')
+                                resultset()
+                            elif len(fourtyselect) > 2:
+                                st.error('뺄셈은 계산 기준이 명확하도록 두 개의 데이터만 선택해주세요.')
+                            else:
+                                st.error('뺄셈을 위해 두 개의 데이터를 선택해야 합니다.')
+                        if fiftyselect == '*':
+                            dfrs[byunsuName] = dfrs[fourtyselect].prod(axis=1)
+                            st.text('기존 열을 이용해 추가한 결과')
+                            resultset()
+                        if fiftyselect == '/':
+                            if len(fourtyselect) == 2:
+                                dfrs[byunsuName] = dfrs[fourtyselect[0]]/dfrs[fourtyselect[1]]
+                                st.text('기존 열을 이용해 추가한 결과')
+                                resultset()
+                            elif len(fourtyselect) >2:
+                                st.error('나눗셈은 계산 기준이 명확하도록 두 개의 데이터만 선택해주세요.')
+                            else:
+                                st.error('나눗셈을 위해 두 개의 데이터를 선택해야 합니다.')
+                        if fiftyselect == '%':
+                            if len(fourtyselect) == 2:
+                                dfrs[byunsuName] = dfrs[fourtyselect[0]] % dfrs[fourtyselect[1]]
+                                st.text('기존 열을 이용해 추가한 결과')
+                                resultset()
+                            elif len(fourtyselect) >2:
+                                st.error('나머지는 계산 기준이 명확하도록 두 개의 데이터만 선택해주세요.')
+                            else:
+                                st.error('나머지를 위해 두 개의 데이터를 선택해야 합니다.')
+                if thirdselect == '스칼라(단일 값) 연산':
+                    fourtyselect = st.selectbox('데이터를 선택해주세요.',['선택하세요']+list(df.select_dtypes(include=['number']).columns))
+                    if fourtyselect != '선택하세요':
+                        fiftyselect = st.selectbox('기호를 입력해주세요.',['선택하세요','+','-','*','/','%'])
+                        if fiftyselect !='선택하세요':
+                            su = st.number_input('값을 입력해주세요.')
+                            if su:
+                                changeStr = f"dfrs['{fourtyselect}'] {fiftyselect} {su}"
+                                condition_str = eval(changeStr)
+                                dfrs[byunsuName] = condition_str
+                                st.text('기존 열을 이용해 추가한 결과')
+                                resultset()
+                if thirdselect == '단일 조건문':
+                    fourtyselect = st.selectbox('데이터를 선택해주세요.',['선택하세요']+list(df.select_dtypes(include=['number']).columns))
+                    if fourtyselect != '선택하세요':
+                        fiftyselect = st.selectbox('연산자를 선택해주세요.',['선택하세요','>','<','>=','<=','==','!='])
+                        if fiftyselect !='선택하세요':
+                            su = st.number_input('기준 값을 입력해주세요.')
+                            true_su = st.text_input('조건이 참일 경우 할당할 값 입력')
+                            false_su = st.text_input('조건이 거짓일 경우 할당할 값 입력')
+                            if true_su.strip() and false_su.strip():
+                                changeStr = f"dfrs['{fourtyselect}']{fiftyselect}{su}"
+                                condition_str = eval(changeStr)
+                                dfrs[byunsuName] = np.where(condition_str,true_su,false_su)
+                                st.text('기존 열을 이용해 추가한 결과')
+                                resultset()
+        if secondselect == '사용자 입력':
+            byunsuName = st.text_input('변수를 입력해주세요.')
+            if byunsuName:
+                codeName = st.text_input('사용자가 원하는 내용을 입력해주세요. 예) df[변수명1] + df[변수명2]')
+                if codeName:
+                    try:
+                        codeChange = eval(codeName)
+                        dfrs[byunsuName] = codeChange
+                        st.text('사용자의 입력에 의한 결과')
                         resultset()
+                    except Exception as e:
+                        st.error("코드 실행 중 오류가 발생했습니다.")
     if firstselect == '그래프로 출력하기':
         st.text('그래프로 출력하기')
