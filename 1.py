@@ -4,7 +4,70 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import time
+from pandas.errors import ParserError
+import io
+from collections import Counter
 
+def get_csv_options(file_object, header_delimiter=',', data_sep_candidates=[',','\t',';','|']):
+
+    file_object.seek(0)
+
+    encodings = ['cp949','euc-kr','utf-8-sig','utf-8']
+    content_string = None
+    successful_encoding = None
+
+    # 인코딩 찾기
+    for enc in encodings:
+        file_object.seek(0)
+        try:
+            content_string = file_object.read().decode(enc)
+            successful_encoding = enc
+            break
+        except UnicodeDecodeError:
+            continue
+
+    if content_string is None:
+        raise Exception("모든 시도된 인코딩으로 파일 내용을 읽을 수 없습니다.")
+
+    string_io = io.StringIO(content_string)
+    lines = string_io.readlines()
+
+    max_delimiters = -1
+    header_index = -1
+
+    for i, line in enumerate(lines[:50]):
+        stripped_line = line.strip()
+        delimiter_count = stripped_line.count(header_delimiter)
+        if delimiter_count > max_delimiters and delimiter_count > 0:
+            max_delimiters = delimiter_count
+            header_index = i
+
+    if header_index != -1:
+        skipped_lines_count = header_index
+    else:
+        skipped_lines_count = 0
+    
+    string_io.seek(0)
+
+    for _ in range(skipped_lines_count + 1):
+        string_io.readline()
+    
+    delimiter_counts = Counter()
+
+    for i in range(5):
+        line = string_io.readline()
+        if not line:
+            break
+        for delim in data_sep_candidates:
+            count = line.count(delim)
+            if count > 0:
+                delimiter_counts[delim] += 1
+
+    final_sep = delimiter_counts.most_common(1)[0][0] if delimiter_counts else ','
+
+    file_object.seek(0)
+
+    return skipped_lines_count , successful_encoding , final_sep
 def clear_all_state():
     file_uploader_key = f"file_uploader_{st.session_state.reset_trigger}"
     if st.session_state[file_uploader_key] is None:
@@ -56,13 +119,24 @@ st.header('정보 분석 사이트')
 csvfile = st.file_uploader('파일을 업로드하세요.', type='csv',key=f"file_uploader_{st.session_state.reset_trigger}",on_change=clear_all_state)
 if csvfile is not None and st.session_state['df_original'] is None:
     try:
-        st.session_state['df_original'] = pd.read_csv(csvfile)
-    except UnicodeDecodeError:
-        csvfile.seek(0)
-        st.session_state['df_original'] = pd.read_csv(csvfile, encoding='cp949')
-    # 초기 분석 대상은 원본 데이터로 설정
-    st.session_state['df_current'] = st.session_state['df_original'].copy() 
-    st.rerun() # 데이터 로드 후 새로고침하여 상태 반영
+        calculated_skiprows , encoding_used , final_sep = get_csv_options(csvfile,header_delimiter=',')
+    except Exception as e:
+        st.error("분석 중 오류 발생")
+        st.session_state['df_original'] = None
+        st.stop()
+    try:
+        st.session_state['df_original'] = pd.read_csv(csvfile, skiprows=calculated_skiprows,encoding=encoding_used,sep=final_sep)
+        if st.session_state['df_original'] is not None:
+            st.session_state['df_current'] = st.session_state['df_original'].copy()
+        else:
+            st.error("데이터프레임이 비어있습니다.")
+            st.session_state['df_original'] = None
+        time.sleep(1)
+        st.rerun()
+    except Exception as e:
+        st.error("데이터 로드 중 오류 발생")
+        st.session_state['df_original'] = None
+        st.stop()
 
 if st.session_state['df_current'] is not None:
     if st.session_state['df_current'].equals(st.session_state['df_original']):
