@@ -22,14 +22,11 @@ def convert_to_numeric_if_possible(value):
         return value
 
 def get_csv_options(file_object, header_delimiter=',', data_sep_candidates=[',','\t',';','|']):
-
     file_object.seek(0)
-
     encodings = ['cp949','euc-kr','utf-8-sig','utf-8']
     content_string = None
     successful_encoding = None
 
-    # 인코딩 찾기
     for enc in encodings:
         file_object.seek(0)
         try:
@@ -59,21 +56,16 @@ def get_csv_options(file_object, header_delimiter=',', data_sep_candidates=[',',
         stripped_line = line.strip()
         delimiter_count = stripped_line.count(header_delimiter)
         if delimiter_count >= threshold and delimiter_count > 0:
-             header_index = i
-             break
-    if header_index != -1:
-        skipped_lines_count = header_index 
-    else:
-        skipped_lines_count = 0
-
+            header_index = i
+            break
+            
+    skipped_lines_count = header_index if header_index != -1 else 0
 
     string_io.seek(0)
-
     for _ in range(skipped_lines_count + 1):
         string_io.readline()
     
     delimiter_counts = Counter()
-
     for i in range(5):
         line = string_io.readline()
         if not line:
@@ -85,9 +77,37 @@ def get_csv_options(file_object, header_delimiter=',', data_sep_candidates=[',',
 
     final_sep = delimiter_counts.most_common(1)[0][0] if delimiter_counts else ','
 
+    header_is_present = True
+    
+    try:
+        temp_df = pd.read_csv(
+            io.StringIO(content_string), 
+            sep=final_sep, 
+            encoding=successful_encoding, 
+            skiprows=skipped_lines_count, 
+            nrows=10, 
+            header=0
+        )
+        
+        unnamed_count = sum(['Unnamed' in str(col) for col in temp_df.columns])
+        if unnamed_count > len(temp_df.columns) / 2:
+             header_is_present = False
+
+        if all(str(col).isdigit() for col in temp_df.columns):
+             header_is_present = False
+
+    except ParserError:
+        header_is_present = False
+    except Exception:
+        header_is_present = False
+
+
+    final_header_arg = 0 if header_is_present else None
+    
     file_object.seek(0)
 
-    return skipped_lines_count , successful_encoding , final_sep
+    return skipped_lines_count , successful_encoding , final_sep, final_header_arg
+
 def clear_all_state():
     file_uploader_key = f"file_uploader_{st.session_state.reset_trigger}"
     if st.session_state[file_uploader_key] is None:
@@ -171,22 +191,71 @@ st.header('정보 분석 사이트')
 csvfile = st.file_uploader('파일을 업로드하세요.', type='csv',key=f"file_uploader_{st.session_state.reset_trigger}",on_change=clear_all_state)
 if csvfile is not None and st.session_state['df_original'] is None:
     try:
-        calculated_skiprows , encoding_used , final_sep = get_csv_options(csvfile,header_delimiter=',')
+        calculated_skiprows , encoding_used , final_sep , final_header_arg = get_csv_options(csvfile,header_delimiter=',')
     except Exception as e:
-        st.error("분석 중 오류 발생")
+        st.error(f"분석 중 오류 발생: {e}")
         st.session_state['df_original'] = None
         st.stop()
+    
     try:
-        st.session_state['df_original'] = pd.read_csv(csvfile, skiprows=calculated_skiprows,encoding=encoding_used,sep=final_sep)
-        if st.session_state['df_original'] is not None:
-            st.session_state['df_current'] = st.session_state['df_original'].copy()
+        csvfile.seek(0)
+        df_header_assumed = pd.read_csv(
+            csvfile, 
+            skiprows=calculated_skiprows, 
+            encoding=encoding_used, 
+            sep=final_sep,
+            header=0
+        )
+        csvfile.seek(0)
+        df_no_header_assumed = pd.read_csv(
+            csvfile, 
+            skiprows=calculated_skiprows, 
+            encoding=encoding_used, 
+            sep=final_sep,
+            header=None
+        )
+
+        df_no_header_assumed.columns = [f'Col_{i}' for i in range(df_no_header_assumed.shape[1])]
+
+        st.info("⚠️ **데이터 로드 설정 확인**")
+        st.dataframe(df_header_assumed)
+        st.text("자동 감지 결과:")
+        
+        default_index = 0 if final_header_arg == 0 else 1
+        
+        header_choice = st.radio(
+            "업로드한 파일의 첫 번째 데이터 행이 **헤더(컬럼명)**가 맞습니까?",
+            ["예, 헤더입니다. (첫 행을 컬럼명으로 사용)", "아니요, 데이터입니다. (자동 컬럼명: Col_0, Col_1...)"],
+            index=default_index,
+            key=f'header_choice_{st.session_state.reset_trigger}'
+        )
+        
+        if header_choice == "예, 헤더입니다. (첫 행을 컬럼명으로 사용)":
+             df_preview = df_header_assumed
         else:
-            st.error("데이터프레임이 비어있습니다.")
-            st.session_state['df_original'] = None
-        time.sleep(1)
-        st.rerun()
+             df_preview = df_no_header_assumed
+             
+        # 미리보기만 보여줍니다.
+        st.subheader("선택 결과 미리보기 (상위 5줄)")
+        st.dataframe(df_preview.head())
+        
+        st.warning('⚠️ **헤더 선택을 완료하셨다면, 아래 버튼을 클릭하여 분석을 시작하세요.**')
+
+        # === 수정된 핵심 로직: 최종 세션 상태 저장은 버튼 클릭 시에만 수행 ===
+        if st.button('데이터 확인 완료 및 분석 시작', key=f'start_analysis_{st.session_state.reset_trigger}'):
+            # 선택에 따라 최종 데이터프레임 결정 및 세션 상태 저장
+            if header_choice == "예, 헤더입니다. (첫 행을 컬럼명으로 사용)":
+                 st.session_state['df_original'] = df_header_assumed.copy()
+            else:
+                 st.session_state['df_original'] = df_no_header_assumed.copy()
+            
+            st.session_state['df_current'] = st.session_state['df_original'].copy()
+            st.rerun() # 버튼 클릭 후 다음 분석 단계로 진행
+
+        st.stop() # 버튼을 누르기 전까지는 이 화면에서 멈춤
+
     except Exception as e:
-        st.error("데이터 로드 중 오류 발생")
+        st.error(f"데이터 로드 중 오류 발생: {e}")
         st.session_state['df_original'] = None
         st.stop()
 
