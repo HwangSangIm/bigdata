@@ -277,7 +277,7 @@ if st.session_state['df_current'] is not None:
     first_options = ['선택하세요','데이터 추출하기','결측치 제어하기','변수 추가하기','그래프로 출력하기']
     firstselect = st.selectbox('어떠한 분석을 하시겠습니까?',first_options,index=0,key=f'first_select_{st.session_state.analysis_step_key}')
     if firstselect == '데이터 추출하기':
-        second_option = ['선택하세요','조건에 맞는 데이터만 추출하기','필요한 변수만 추출하기','순서대로 정렬하기','집단별로 요약하기']
+        second_option = ['선택하세요','조건에 맞는 데이터만 추출하기','필요한 변수만 추출하기','순서대로 정렬하기','집단별로 요약하기','사용자 입력']
         secondselect = st.selectbox('어떠한 방법으로 전처리 하시겠습니까?',second_option,key=f'second_select_{st.session_state.analysis_step_key}')
         selected_index = second_option.index(secondselect)
         if selected_index == 1:
@@ -343,6 +343,15 @@ if st.session_state['df_current'] is not None:
                                 st.text('집단별로 요약한 결과')
                                 dfrs = df.groupby(thirdselect , as_index = False).agg(**{agg_text : (fourtyselect , fiftyselect)}).sort_values(agg_text)
                                 resultset()
+        elif selected_index == 5:
+            agg_text = st.text_input("사용자가 원하는 내용을 입력해주세요. 예 : df.groupby('지점')")
+            if agg_text:
+                try:
+                    st.text('사용자가 원하는 대로 입력한 결과')
+                    dfrs = eval(agg_text)
+                    resultset()
+                except Exception as e:
+                    st.error('코드 실행 중 오류가 발생했습니다.')
     if firstselect == '결측치 제어하기':
         second_option = ['선택하세요','결측치 확인','결측치 제거','결측치 변경']
         secondselect = st.selectbox('어떠한 방법을 사용하시겠습니까?',second_option)
