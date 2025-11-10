@@ -376,9 +376,10 @@ if sideoption == '파일 업로드':
                     dfrs[thirdselect] = dfrs[thirdselect].replace(r'^\s*$',np.nan,regex=True)
                     na_count_before = dfrs_temp[thirdselect].isnull().any(axis=1).sum()
                     if na_count_before > 0:
+                        removed_data = dfrs_temp[dfrs_temp[thirdselect].isna().any(axis=1)]
                         dfrs = dfrs_temp.dropna(subset=thirdselect)
                         st.text('제거할 데이터')
-                        st.dataframe(dfrs_temp.dropna(subset=thirdselect))
+                        st.dataframe(removed_data)
                         st.text('결측치를 제거한 결과')
                         resultset()
                     else:
