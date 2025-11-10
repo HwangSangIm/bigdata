@@ -611,3 +611,5 @@ if sideoption == '예시':
         st.rerun() # 변경 사항을 바로 적용
     st.header("예시 페이지")
     st.text("예시입니다.")
+    image_url1 = "https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C1.png?raw=true"
+    st.image(image_url1)
