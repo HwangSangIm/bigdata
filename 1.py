@@ -509,7 +509,11 @@ if sideoption == '파일 업로드':
                                         final_rs = int(codeChange)
                                 except ValueError:
                                     pass
-                            dfrs[byunsuName] = final_rs
+                            if pd.api.types.is_datetime64_any_dtype(final_rs):
+                                dfrs[byunsuName] = final_rs
+                                dfrs[byunsuName] = dfrs[byunsuName].dt.date
+                            else:
+                                dfrs[byunsuName] = final_rs
                             st.text('사용자의 입력에 의한 결과')
                             resultset()
                         except Exception as e:
