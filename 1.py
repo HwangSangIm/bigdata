@@ -497,7 +497,10 @@ if sideoption == '파일 업로드':
                         try:
                             codeChange = eval(codeName)
                             if isinstance(codeChange, pd.Series):
-                                final_rs = pd.to_numeric(codeChange, errors='ignore')
+                                if pd.api.types.is_datetime64_any_dtype(codeChange):
+                                    final_rs = codeChange
+                                else:
+                                    final_rs = pd.to_numeric(codeChange, errors='ignore')
                             elif isinstance(codeChange, str):
                                 try:
                                     if '.' in codeChange:
