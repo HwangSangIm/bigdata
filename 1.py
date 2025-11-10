@@ -612,4 +612,11 @@ if sideoption == '예시':
     st.header("예시 페이지")
     st.text("예시입니다.")
     image_url1 = "https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C1.png?raw=true"
+    image_url2 = "https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C2.png?raw=true"
+    image_url3 = "https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C3.png?raw=true"
+    st.text('사용자가 원하는대로 데이터를 추출한 결과')
     st.image(image_url1)
+    st.text('막대 그래프(plotly)로 출력한 결과')
+    st.image(image_url2)
+    st.text('결측치를 변경한 결과')
+    st.image(image_url3)
