@@ -371,12 +371,18 @@ if sideoption == '파일 업로드':
             if selected_index == 2:
                 thirdselect = st.multiselect('어떤 데이터 결측치를 제거하시겠습니까?(빈칸 포함)',df.columns)
                 if len(thirdselect) > 0:
+                    dfrs_temp = df.copy() # 원본 df(df_current)에서 시작
+                    dfrs_temp[thirdselect] = dfrs_temp[thirdselect].replace(r'^\s*$', np.nan, regex=True)
                     dfrs[thirdselect] = dfrs[thirdselect].replace(r'^\s*$',np.nan,regex=True)
-                    dfrs = df.dropna(subset=thirdselect)
-                    st.text('제거할 데이터')
-                    st.dataframe(df[thirdselect])
-                    st.text('결측치를 제거한 결과')
-                    resultset()
+                    na_count_before = dfrs_temp[thirdselect].isnull().any(axis=1).sum()
+                    if na_count_before > 0:
+                        dfrs = dfrs_temp.dropna(subset=thirdselect)
+                        st.text('제거할 데이터')
+                        st.dataframe(df[thirdselect])
+                        st.text('결측치를 제거한 결과')
+                        resultset()
+                    else:
+                        st.warning("선택한 컬럼들에는 제거할 결측치(또는 빈칸)가 없습니다.")
             if selected_index == 3:
                 thirdselect = st.selectbox('어떤 데이터의 결측치 값을 바꾸겠습니까?(빈칸 포함)',['선택하세요'] + list(df.columns))
                 if thirdselect != '선택하세요':
