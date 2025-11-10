@@ -9,8 +9,12 @@ import io
 from collections import Counter
 import plotly.express as px
 import plotly.graph_objects as go
+import matplotlib.font_manager as fm
 
+font_path = 'malgun.ttf' 
+fm.fontManager.addfont(font_path) 
 plt.rcParams['font.family'] =  'Malgun Gothic'
+plt.rcParams['axes.unicode_minus'] = False # 마이너스 기호 깨짐 방지
 
 def convert_to_numeric_if_possible(value):
     try:
@@ -273,9 +277,11 @@ if sideoption == '파일 업로드':
         else:
             st.text('수정된 파일 내용')
         df = st.session_state['df_current']
+        df.columns = df.columns.str.replace(r'[^\w]', '', regex=True)
+        df.columns = df.columns.str.replace('℃', '', regex=False)
         dfrs = df.copy()
         st.dataframe(df)
-        first_options = ['선택하세요','데이터 추출하기','결측치 제어하기','변수 추가하기','그래프로 출력하기']
+        first_options = ['선택하세요','데이터 추출하기','결측치 제어하기','변수 추가하기','그래프로 출력하기','정보확인']
         firstselect = st.selectbox('어떠한 분석을 하시겠습니까?',first_options,index=0,key=f'first_select_{st.session_state.analysis_step_key}')
         if firstselect == '데이터 추출하기':
             second_option = ['선택하세요','조건에 맞는 데이터만 추출하기','필요한 변수만 추출하기','순서대로 정렬하기','집단별로 요약하기','사용자 입력']
@@ -609,6 +615,12 @@ if sideoption == '파일 업로드':
                         plt.close(fig)
                 else:
                     plt.close(fig)
+        if firstselect == '정보확인':
+            buffer = io.StringIO()
+            df.info(buf=buffer)
+            info_string = buffer.getvalue()
+            st.code(info_string, language='text')
+            st.dataframe(df.describe())
 if sideoption == '예시':
     if st.session_state['df_original'] is not None or st.session_state['df_current'] is not None:
         st.session_state['df_original'] = None
