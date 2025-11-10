@@ -522,8 +522,8 @@ if sideoption == '파일 업로드':
             fig , ax = plt.subplots()
             secondselect = st.selectbox('어떤 그래프를 그리겠습니까?',['선택하세요','산점도로 표현하기','막대 그래프로 표현하기','선 그래프로 표현하기','상자 그림으로 표현하기'])
             if secondselect == '산점도로 표현하기':
-                x_options = ['선택하세요'] + list(df.select_dtypes(include=np.number).columns)
-                y_options = ['선택하세요'] + list(df.select_dtypes(include=np.number).columns)
+                x_options = ['선택하세요'] + list(df.columns)
+                y_options = ['선택하세요'] + list(df.columns)
                 fo = st.selectbox('x축에 넣을 데이터를 고르세요.',x_options)
                 so = st.selectbox('y축에 넣을 데이터를 고르세요.',y_options)
                 if fo != '선택하세요' and so != '선택하세요':
@@ -544,8 +544,8 @@ if sideoption == '파일 업로드':
                 else:
                     plt.close(fig)
             elif secondselect == '막대 그래프로 표현하기':
-                x_options = ['선택하세요'] + list(df.select_dtypes(include=['object','category']).columns)
-                y_options = ['선택하세요'] + list(df.select_dtypes(include=np.number).columns)
+                x_options = ['선택하세요'] + list(df.columns)
+                y_options = ['선택하세요'] + list(df.columns)
                 fo = st.selectbox('x축에 넣을 데이터를 고르세요.',x_options)
                 so = st.selectbox('y축에 넣을 데이터를 고르세요.',y_options)
                 if fo != '선택하세요' and so != '선택하세요':
@@ -566,8 +566,8 @@ if sideoption == '파일 업로드':
                 else:
                     plt.close(fig)
             if secondselect =='선 그래프로 표현하기':
-                x_options = ['선택하세요'] + list(df.select_dtypes(include=[np.number,'datetime']).columns)
-                y_options = ['선택하세요'] + list(df.select_dtypes(include=np.number).columns)
+                x_options = ['선택하세요'] + list(df.columns)
+                y_options = ['선택하세요'] + list(df.columns)
                 fo = st.selectbox('x축에 넣을 데이터를 고르세요.',x_options)
                 so = st.selectbox('y축에 넣을 데이터를 고르세요.',y_options)
                 if fo != '선택하세요' and so != '선택하세요':
@@ -588,8 +588,8 @@ if sideoption == '파일 업로드':
                 else:
                     plt.close(fig)
             if secondselect =='상자 그림으로 표현하기':
-                x_options = ['선택하세요'] + list(df.select_dtypes(include=['object','category']).columns)
-                y_options = ['선택하세요'] + list(df.select_dtypes(include=np.number).columns)
+                x_options = ['선택하세요'] + list(df.columns)
+                y_options = ['선택하세요'] + list(df.columns)
                 fo = st.selectbox('x축에 넣을 데이터를 고르세요.',x_options)
                 so = st.selectbox('y축에 넣을 데이터를 고르세요.',y_options)
                 if fo != '선택하세요' and so != '선택하세요':
