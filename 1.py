@@ -378,7 +378,7 @@ if sideoption == '파일 업로드':
                     if na_count_before > 0:
                         dfrs = dfrs_temp.dropna(subset=thirdselect)
                         st.text('제거할 데이터')
-                        st.dataframe(df[thirdselect])
+                        st.dataframe(dfrs_temp.dropna(subset=thirdselect))
                         st.text('결측치를 제거한 결과')
                         resultset()
                     else:
