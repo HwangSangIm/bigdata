@@ -333,11 +333,11 @@ if sideoption == '파일 업로드':
                         dfrs = df.sort_values(thirdselect)
                         resultset()
             elif selected_index == 4:
-                thirdselect = st.selectbox('기준을 고르세요.',['선택하세요'] + list(df.columns))
+                thirdselect = st.selectbox('기준을 고르세요.',['선택하세요'] + list(df.select_dtypes(include=['object' , 'category']).columns))
                 if thirdselect != '선택하세요':
                     agg_text = st.text_input('추가할 변수명을 적으세요.')
                     if agg_text:
-                        fourtyselect = st.selectbox('원래 변수명',['선택하세요'] + list(df.columns))
+                        fourtyselect = st.selectbox('원래 변수명',['선택하세요'] + list(df.select_dtypes(include=['number']).columns))
                         if fourtyselect != '선택하세요':
                             fiftyselect = st.selectbox('함수명',['선택하세요','mean','std','sum','median','min','max','count'])
                             if fiftyselect != '선택하세요':
