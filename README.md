@@ -37,7 +37,7 @@
 
 ## 📽️ 5. 시연 동영상 및 링크 설정 (Demo Video & Links)
 
-| **시연 동영상** | [시연 동영상 링크] |
+| **시연 동영상** | [시연 동영상 바로가기](https://github.com/HwangSangIm/bigdata/blob/main/%EC%8B%9C%EC%97%B0.mp4) |
 
 ### 🖼️ 시연 이미지 예시
 * **사용자가 원하는대로 데이터를 추출한 결과**
