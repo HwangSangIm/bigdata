@@ -51,8 +51,8 @@
 
 | 이름 | 역할 | 사진 |
 | :--- | :--- | :---: |
-| **HwangSangIm** | **주요 기능 개발 및 구현** | ![HwangSangIm](https://github.com/HwangSangIm/bigdata/blob/main/images/hwangsangim.jpg?raw=true) |
-| **yousung1020** | **코드 품질 관리 및 문서 작성** | ![yousung1020](https://github.com/HwangSangIm/bigdata/blob/main/images/yousung1020.jpg?raw=true) |
+| **HwangSangIm** | **핵심 개발자 (Core Developer)**: 애플리케이션 프레임워크 구축 및 데이터 분석 로직(전처리, 시각화, 파일 입출력) 전체 구현 | ![HwangSangIm](https://github.com/HwangSangIm.png?size=80) |
+| **yousung1020** | **문서화 및 테스트 (Documentation & Testing)**: 프로젝트 코드 정리 및 문서화(주석, README) 담당, 기능 검증 및 버그 테스트 수행 | ![yousung1020](https://github.com/yousung1020.png?size=80) |
 
 ---
 
