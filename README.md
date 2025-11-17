@@ -51,8 +51,8 @@
 
 | 이름 | 역할 | 사진 |
 | :--- | :--- | :---: |
-| **HwangSangIm** | **주요 기능 개발 및 구현** | ![HwangSangIm](https://avatars.githubusercontent.com/u/사용자ID?v=4) |
-| **yousung1020** | **코드 품질 관리 및 문서 작성** | ![yousung1020](https://avatars.githubusercontent.com/u/사용자ID?v=4) |
+| **HwangSangIm** | **주요 기능 개발 및 구현** | ![HwangSangIm](https://github.com/HwangSangIm/bigdata/blob/main/images/hwangsangim.jpg?raw=true) |
+| **yousung1020** | **코드 품질 관리 및 문서 작성** | ![yousung1020](https://github.com/HwangSangIm/bigdata/blob/main/images/yousung1020.jpg?raw=true) |
 
 ---
 
