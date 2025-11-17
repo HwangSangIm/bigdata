@@ -170,7 +170,7 @@ def resultset (fig=None):
                 # CSV 저장 (기존 기능)
                 st.download_button(
                     label='결과 파일로 저장(CSV)', 
-                    data=dfrs.to_csv(index=False).encode('utf-8'), 
+                    data=dfrs.to_csv(index=False).encode('utf-8-sig'), 
                     file_name=f'{name}.csv',
                     mime='text/csv'
                 )
