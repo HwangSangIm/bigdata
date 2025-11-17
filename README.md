@@ -38,7 +38,8 @@
 ## 📽️ 5. 시연 동영상 및 링크 설정 (Demo Video & Links)
 
 | **시연 동영상** | [시연 동영상 바로가기](https://www.youtube.com/watch?v=sC1rJ-hZqd8) |
-https://github.com/user-attachments/assets/2b889e9e-d1cd-48cf-81dd-48c65c8b87c2
+<br>
+<video src="https://github.com/user-attachments/assets/2b889e9e-d1cd-48cf-81dd-48c65c8b87c2" controls="controls" style="max-width: 100%;"></video>
 ### ✨ 분석 기능 사용 예시 (Illustrative Examples)
 
 #### 📌 예시 1: 데이터 추출 및 정렬 (Filtering & Sorting)
