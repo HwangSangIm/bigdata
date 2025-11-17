@@ -39,11 +39,25 @@
 
 | **시연 동영상** | [시연 동영상 바로가기](https://www.youtube.com/watch?v=sC1rJ-hZqd8) |
 
-### 🖼️ 시연 이미지 예시
-* **사용자가 원하는대로 데이터를 추출한 결과**
-    
-* **Plotly 막대 그래프로 시각화한 결과**
-    
+### ✨ 분석 기능 사용 예시 (Illustrative Examples)
+
+#### 📌 예시 1: 데이터 추출 및 정렬 (Filtering & Sorting)
+* **내용:** "직업(Job)"이 'Engineer'이면서 "나이(Age)"가 30세 이상인 데이터를 추출하여, "연봉(Salary)" 기준으로 내림차순 정렬합니다.
+* **효과:** 복잡한 코드를 작성하지 않고도 특정 비즈니스 조건에 맞는 핵심 데이터를 빠르게 필터링할 수 있습니다.
+
+#### 📌 예시 2: 변수 추가 (Feature Engineering)
+* **내용:** "연봉(Salary)"이 6000만원 이상이면 '고소득층', 그 미만이면 '일반층'으로 분류하는 **'소득 등급(Income_Level)'** 변수를 새로 생성합니다. 또는 '총 판매액'과 '구매 비용'을 이용해 **'순 이익(Net_Profit)'** 컬럼을 생성합니다.
+* **효과:** 분석 목적에 맞는 새로운 파생 변수를 쉽게 만들 수 있어, 데이터의 분석력을 높일 수 있습니다.
+
+#### 📌 예시 3: 시각화 (Visualization)
+* **내용:** '소득 등급(Income\_Level)'별로 '순 이익(Net\_Profit)'의 평균을 계산한 후, 결과를 **막대 그래프**로 시각화하여 두 그룹 간의 수익 차이를 직관적으로 비교합니다.
+* **효과:** 전처리된 데이터의 패턴과 집단 간의 차이를 한눈에 파악하여 다음 분석 단계에 대한 인사이트를 얻을 수 있습니다.
+
+### 📊 주요 분석 결과 이미지
+
+| 데이터 추출/변환 결과 | 시각화 결과 1 | 시각화 결과 2 |
+| :---: | :---: | :---: |
+| ![데이터 추출 결과](https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C1.png?raw=true) | ![시각화 예시 1](https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C2.png?raw=true) | ![시각화 예시 2](https://github.com/HwangSangIm/bigdata/blob/main/%EC%98%88%EC%8B%9C3.png?raw=true) |
 
 ---
 
